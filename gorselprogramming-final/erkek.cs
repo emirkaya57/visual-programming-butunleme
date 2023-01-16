@@ -12,95 +12,85 @@ using System.Data.OleDb;
 using System.Data.Common;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
 
 namespace gorselprogramming_final
 {
     public partial class erkek : Form
     {
+        MySql.Data.MySqlClient.MySqlConnection baglan;
         public erkek()
         {
             InitializeComponent();
+            try
+            {
+
+                baglan = new MySql.Data.MySqlClient.MySqlConnection("server=localhost; uid=root;pwd=; database=db_voleybol");
+                baglan.Open();
+            }
+            catch (MySql.Data.MySqlClient.MySqlException hata)
+            {
+                MessageBox.Show(hata.Message);
+
+            }
         }
-        OleDbConnection baglan = new OleDbConnection("Provider=Microsoft.ACE.OleDb.12.0;Data Source=voleybol1.accdb");
-        OleDbCommand komut = new OleDbCommand();
+       
 
  
      
 
         private void button1_Click(object sender, EventArgs e)
         {
-            komut = new OleDbCommand("insert into oyuncular (AdiSoyadi,tc,yas,telefon,takim) values ('" + adsoyad.Text + "','" + tc.Text + "','" + yas.Text + "','" + telefon.Text + "','" + takim.Text + "',  ");
-           komut.Connection = baglan;
-            komut.ExecuteNonQuery();
-            baglan.Close();
+            kayıtekle git = new kayıtekle();
+            git.Show();
+            this.Close();
 
-            adsoyad.Clear();
-            tc.Clear();
-            yas.Clear();
-            telefon.Clear();
-            takim.Clear();
-            baglan.Open();
-
-            OleDbDataAdapter da = new OleDbDataAdapter("Select * from oyuncular", baglan);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
-            dataGridView1.DataSource = dt;
 
         }
 
-        private void erkek_Load(object sender, EventArgs e)
-        {
-            baglan.Open();
-            OleDbDataAdapter da = new OleDbDataAdapter("Select * from oyuncular", baglan);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
-            dataGridView1.DataSource = dt;
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            komut = new OleDbCommand();
-            baglan.Open();
-            komut.Connection = baglan;
-            komut.CommandText = "update oyuncular set AdiSoyadi='" + adsoyad.Text + "',takim='" + takim.Text + "',yas='" + yas.Text + "' where tc=" + tc.Text + "";
-            komut.ExecuteNonQuery();
-           
-
-            OleDbDataAdapter da = new OleDbDataAdapter("Select * from oyuncular", baglan);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
-            dataGridView1.DataSource = dt;
-            baglan.Close();
-
-        }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            komut = new OleDbCommand();
-            baglan.Open();
-            komut.Connection = baglan;
-            komut.CommandText = "delete from oyuncular where tc=" + tc.Text + "";
-            komut.ExecuteNonQuery();
-            baglan.Close();
+            string baslk = "1";
+            MySqlCommand cmd = new MySqlCommand("SELECT*FROM tbl_oyuncu WHERE takim_id='" + baslk + "'", baglan);
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                listBox1.Items.Add(dr[1]+"      " + dr[2] );
+               
+            }
+            dr.Close();
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            kadin uyg = new kadin();
-            uyg.ShowDialog();
+            kadin go = new kadin();
+            go.Show();
+            this.Close();
         }
 
-        private void  dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-           
-                dataGridView1.CurrentRow.Selected = true;
-                adsoyad.Text = dataGridView1.Rows[e.RowIndex].Cells["AdiSoyadi"].FormattedValue.ToString();
-                tc.Text = dataGridView1.Rows[e.RowIndex].Cells["tc"].FormattedValue.ToString();
-                yas.Text = dataGridView1.Rows[e.RowIndex].Cells["yas"].FormattedValue.ToString();
-                telefon.Text = dataGridView1.Rows[e.RowIndex].Cells["telefon"].FormattedValue.ToString();
-                takim.Text = dataGridView1.Rows[e.RowIndex].Cells["takim"].FormattedValue.ToString();
 
+        private void button5_Click(object sender, EventArgs e)
+        {
+            saha saha = new saha();
+            saha.Show();
+            this.Close();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            string baslk = "1";
+            MySqlCommand cmd = new MySqlCommand("SELECT*FROM tbl_oyuncu WHERE takim_id='" + baslk + "'", baglan);
+            MySqlDataReader dr = cmd.ExecuteReader();
+            cmd.CommandText = "update tbl_oyuncu set isim_soyisim='" + adsoyad.Text + "',takim_id='" + tc.Text + "";
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            string baslk = "1";
+            MySqlCommand cmd = new MySqlCommand("SELECT*FROM tbl_oyuncu WHERE takim_id='" + baslk + "'", baglan);
+            MySqlDataReader dr = cmd.ExecuteReader();
+            cmd.CommandText = "delete from tbl_oyuncu where isim_soyisim=" + adsoyad.Text + "";
         }
     }
 }

@@ -8,38 +8,89 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Data.OleDb;
-using System.Data.Common;
+using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
+using MySql.Data;
 
 namespace gorselprogramming_final
 {
     public partial class Form1 : Form
-    {
+    {MySql.Data.MySqlClient.MySqlConnection baglan;
         public Form1()
         {
             InitializeComponent();
-        }
-        int ks;
-        OleDbConnection baglan = new OleDbConnection("Provider=Microsoft.ACE.OleDb.12.0;Data Source=voleybol1.accdb");
+            try
+            {
 
+                baglan = new MySql.Data.MySqlClient.MySqlConnection("server=localhost; uid=root;pwd=; database=db_voleybol");
+                baglan.Open();
+            }
+            catch (MySql.Data.MySqlClient.MySqlException hata)
+            {
+                MessageBox.Show(hata.Message);
+
+            }
+        }
+
+        bool kontrol;
         private void button1_Click(object sender, EventArgs e)
         {
-            baglan.Open();
-            OleDbCommand komut = new OleDbCommand("SELECT COUNT(*) FROM kullanici where uyeadi=@uyeadi and uyesifre=@uyesifre", baglan);
-            komut.Parameters.Add("@uyeadi", textBox1.Text);
-            komut.Parameters.Add("@uyesifre", textBox2.Text);
-            ks = int.Parse(komut.ExecuteScalar().ToString());
+            string kullanici = textBox1.Text;
+            string sifre = textBox2.Text;
 
-            if (ks == 1)
+            if (textBox1.Text == "Kullanıcı adı" || textBox2.Text == "Şifre")
             {
-                this.Hide();
-                erkek uyg = new erkek();
-                uyg.ShowDialog();
+                MessageBox.Show("boş bırakmayınız");
             }
             else
-                MessageBox.Show("Giriş Başarısız");
-            baglan.Close();
+            {
+                MySqlCommand cmd = new MySqlCommand("SELECT*FROM kullanicilar", baglan);
+                MySqlDataReader dr = cmd.ExecuteReader();
+                while (dr.Read())
+                {
+                    if (kullanici == dr["username"].ToString().TrimEnd() && sifre == dr["password"].ToString().TrimEnd())
+                    {
+
+                        kontrol = true;
+                        break;
+
+                    }
+                    else
+                    {
+                        kontrol = false;
+                    }
+                }
+                dr.Close();
+
+                if (kontrol)
+                {
+                    erkek nn = new erkek();
+                    nn.Show();
+                    Hide();
+                }
+                else
+                {
+                    MessageBox.Show("kullanıcı adı veya şifre hatalı");
+                }
+
+
+            }
 
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            üyeol git = new üyeol();
+            git.Show(Owner);
+            this.Hide();
+        }
     }
-}
+
+        }
+    
+

@@ -2,83 +2,88 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Data.OleDb;
 using System.Drawing;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Data.OleDb;
+using System.Data.Common;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
 
 namespace gorselprogramming_final
 {
     public partial class kadin : Form
     {
+        MySql.Data.MySqlClient.MySqlConnection baglan;
         public kadin()
         {
             InitializeComponent();
-        }
-        OleDbConnection baglan = new OleDbConnection("Provider=Microsoft.ACE.OleDb.12.0;Data Source=voleybol1.accdb");
-        OleDbCommand komut = new OleDbCommand();
+            try
+            {
 
-        private void kadin_Load(object sender, EventArgs e)
-        {
-            baglan.Open();
-            OleDbDataAdapter da = new OleDbDataAdapter("Select * from kadin", baglan);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
-            dataGridView1.DataSource = dt;
+                baglan = new MySql.Data.MySqlClient.MySqlConnection("server=localhost; uid=root;pwd=; database=db_voleybol");
+                baglan.Open();
+            }
+            catch (MySql.Data.MySqlClient.MySqlException hata)
+            {
+                MessageBox.Show(hata.Message);
 
+            }
         }
+
+
+
+
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Form1 form = new Form1();
-            form.Show();
-            this.Hide();
+            kadinkayit git = new kadinkayit();
+            git.Show();
+            this.Close();
+
+
         }
 
-        private void button2_click(object sender, EventArgs e)
-        {
-            komut = new OleDbCommand("insert into kadin (id,adi_soyadi,dogum_tarihi,takim,) values ('" + textBox4.Text + "','" + textBox1.Text + "','" + textBox2.Text + "','" + textBox3.Text + "' ");
-            komut.Connection = baglan;
-            komut.ExecuteNonQuery();
-            baglan.Close();
-
-            textBox1.Clear();
-            textBox2.Clear();
-            textBox3.Clear();
-            textBox4.Clear();
-            baglan.Open();
-
-            OleDbDataAdapter da = new OleDbDataAdapter("Select * from kadin", baglan);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
-            dataGridView1.DataSource = dt;
-        }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            komut = new OleDbCommand();
-            baglan.Open();
-            komut.Connection = baglan;
-            komut.CommandText = "update kadin set id='" + textBox4.Text + "',takim='" + textBox3.Text + "',dogum_tarihi='" + textBox2.Text + "' where adi_soyadi=" + textBox1.Text + "";
-            komut.ExecuteNonQuery();
-            baglan.Close();
+            string baslk = "1";
+            MySqlCommand cmd = new MySqlCommand("SELECT*FROM tbl_oyuncu WHERE takim_id='" + baslk + "'", baglan);
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                listBox1.Items.Add(dr[1] + "      " + dr[2]);
 
-            OleDbDataAdapter da = new OleDbDataAdapter("Select * from kadin", baglan);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
-            dataGridView1.DataSource = dt;
+            }
+            dr.Close();
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
-            komut = new OleDbCommand();
-            baglan.Open();
-            komut.Connection = baglan;
-            komut.CommandText = "delete from kadin where id=" + textBox4.Text + "";
-            komut.ExecuteNonQuery();
-            baglan.Close();
+            erkek git = new erkek();
+            git.Show();
+            this.Close();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            string baslk = "2";
+            MySqlCommand cmd = new MySqlCommand("SELECT*FROM tbl_oyuncu WHERE takim_id='" + baslk + "'", baglan);
+            MySqlDataReader dr = cmd.ExecuteReader();
+            cmd.CommandText = "update tbl_oyuncu set isim_soyisim='" + adsoyad.Text + "',takim_id='" + tc.Text + "";
+
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            string baslk = "2";
+            MySqlCommand cmd = new MySqlCommand("SELECT*FROM tbl_oyuncu WHERE takim_id='" + baslk + "'", baglan);
+            MySqlDataReader dr = cmd.ExecuteReader();
+            cmd.CommandText = "delete from tbl_oyuncu where isim_soyisim=" + adsoyad.Text + "";
         }
     }
 }
